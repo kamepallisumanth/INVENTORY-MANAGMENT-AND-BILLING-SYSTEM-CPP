@@ -7,7 +7,7 @@
 
 struct Product {
     int id;
-    string name;
+   std:: string name;
     double price;
     int quantity;
 }
@@ -23,7 +23,7 @@ private:
 
 public:
     InventorySystem()
-    void addOrUpdateProduct(int id, const string &name, double price, string quantity);
+    void addOrUpdateProduct(int id, const  std::string &name, double price, int quantity);
     Product* searchProduct(int id);
     void displayInventory() const;
     void checkLowStock() const;
@@ -31,6 +31,6 @@ public:
     void reprintReceipt() const;
 } 
 
-bool authenticateUser(string &loggedInUser, string &role);
+bool authenticateUser(string &loggedInUser, std:: string &role);
 
 #endif // INVENTORY_H
