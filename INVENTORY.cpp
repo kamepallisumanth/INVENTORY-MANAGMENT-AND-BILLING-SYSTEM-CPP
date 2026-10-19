@@ -1,4 +1,4 @@
-#include "Inventory.h"
+#include "INVENTORY.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,7 +11,7 @@ InventorySystem::InventorySystem() {
     loadFromFile();
 }
 
-void loadFromFile() {
+void InventorySystem::loadFromFile() {
     ifstream file(filename);
     if (!file.is_open()) return;
 
