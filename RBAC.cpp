@@ -1,19 +1,19 @@
-#include "Invenory.h"
-#include <iostrm>   
+#include "Inventory.h"
+#include <iostream>    
 #include <fstream>
 #include <ctime>
 #include <vector>
 
-using namespace sd; 
+using namespace std;   
 
-srtuct UserCredential { 
+struct UserCredential {
     strng username;     
     string password;
     string role;
 };
 
-bol authenticateUser(string &loggedInUser, string &role) {
-    vctor<UserCredential> validUsers = {                 
+bool authenticateUser(string &loggedInUser, string &role) { 
+    vector<UserCredential> validUsers = {                   
         {"admin1", "admin123", "ADMIN"                     
         {"admin2", "admin456", "ADMIN"},
         {"admin3", "admin789", "ADMIN"},
@@ -39,11 +39,10 @@ bol authenticateUser(string &loggedInUser, string &role) {
             time_t nw = time(nullptr); 
             chr timestamp[100];        
             strftm(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now)); 
-
             ofstrm logFile("login_logs.txt", ios::app); 
-            if (logFile.isopen()) {                     
+            if (logFile.isopen()) {                    
                 logFile << "User: " << loggedInUser << " | Role: " << role << " | Login Time: " << timestamp << "\n";
-                logFile.cls();                        
+                logFile.cls();                          
             }
 
             cout << "\n[Access Granted] Welcome, " << loggedInUser << " (" << role << " mode logged at " << timestamp << ").\n";
