@@ -14,7 +14,7 @@ struct UserCredential {
 
 bool authenticateUser(string &loggedInUser, string &role) {
     vector<UserCredential> validUsers = {
-        {"admin1", "admin123", "ADMIN"}, 
+        {"admin1", "admin123", "ADMIN"},
         {"admin2", "admin456", "ADMIN"},
         {"admin3", "admin789", "ADMIN"},
         {"admin4", "admin999", "ADMIN"},
@@ -22,31 +22,32 @@ bool authenticateUser(string &loggedInUser, string &role) {
         {"cashier2", "cash456", "CASHIER"}
     };
 
-    string username, password; 
-    cout << "===================================\n"; 
+    string username, password;
+    cout << "===================================\n";
     cout << "    MULTI-USER SYSTEM LOGIN        \n";
     cout << "===================================\n";
     cout << "Username: ";
-    cin >> username; 
+    cin >> username;
     cout << "Password: ";
     cin >> password;
 
-    for (const auto& usr : validUsers) { 
-        if (user.usernme == username && user.password == password) { 
+    for (const auto& user : validUsers) {
+        if (user.username == username && user.password == password) {
             loggedInUser = user.username;
             role = user.role;
 
-            time_t nw = time(nullptr); 
-            chr timestamp[100];        
-            strftm(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now)); 
-            ofstrm logFile("login_logs.txt", ios::app); 
-            if (logFile.isopen()) {                     
+            time_t now = time(nullptr);
+            char timestamp[100];
+            strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
+
+            ofstream logFile("login_logs.txt", ios::app);
+            if (logFile.is_open()) {
                 logFile << "User: " << loggedInUser << " | Role: " << role << " | Login Time: " << timestamp << "\n";
-                logFile.cls();                         
+                logFile.close();
             }
 
             cout << "\n[Access Granted] Welcome, " << loggedInUser << " (" << role << " mode logged at " << timestamp << ").\n";
-            retun true; 
+            return true;
         }
     }
 
