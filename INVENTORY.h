@@ -28,7 +28,14 @@ public:
     void checkLowStock() const;
     void processBilling();
     void reprintReceipt() const;
+    
+    // NEW FEATURE: Search products by name (substring matching)
+    void searchByName(const std::string &keyword) const;
 };
+
+bool authenticateUser(std::string &loggedInUser, std::string &role);
+
+#endif // INVENTORY_H
 
 bool authenticateUser(std::string &loggedInUser, std::string &role);
 
