@@ -81,6 +81,39 @@ void InventorySystem::displayInventory() const {
     cout << "=======================================================\n";
 }
 
+// NEW FEATURE: Substring search implementation
+void InventorySystem::searchByName(const string &keyword) const {
+    if (catalog.empty()) {
+        cout << "\n[Notice] Inventory is empty.\n";
+        return;
+    }
+
+    bool found = false;
+    cout << "\n=======================================================\n";
+    cout << "              SEARCH RESULTS FOR: \"" << keyword << "\"    \n";
+    cout << "=======================================================\n";
+    cout << left << setw(8) << "ID" 
+         << setw(22) << "Product Name" 
+         << setw(12) << "Price ($)" 
+         << setw(10) << "Stock" << "\n";
+    cout << "-------------------------------------------------------\n";
+
+    for (const auto& pair : catalog) {
+        if (pair.second.name.find(keyword) != string::npos) {
+            cout << left << setw(8) << pair.second.id 
+                 << setw(22) << pair.second.name 
+                 << "$" << setw(11) << fixed << setprecision(2) << pair.second.price 
+                 << setw(10) << pair.second.quantity << "\n";
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "[Notice] No products found matching keyword: \"" << keyword << "\"\n";
+    }
+    cout << "=======================================================\n";
+}
+
 void InventorySystem::checkLowStock() const {
     bool lowStockFound = false;
     cout << "\n=======================================================\n";
@@ -126,7 +159,11 @@ void InventorySystem::processBilling() {
     cout << "\n--- BILLING COUNTER ---\n";
     do {
         cout << "Enter Product ID: ";
-        cin >> choiceId;
+        while (!(cin >> choiceId)) {
+            cout << "[Error] Invalid input! Please enter a valid numeric Product ID: ";
+            cin.clear();
+            cin.ignore(10000, '\n');
+        }
 
         Product* prod = searchProduct(choiceId);
         if (prod == nullptr) {
@@ -134,12 +171,14 @@ void InventorySystem::processBilling() {
         } else {
             cout << "Product Found: " << prod->name << " | Stock Available: " << prod->quantity << "\n";
             cout << "Enter Quantity to purchase: ";
-            cin >> qty;
+            while (!(cin >> qty) || qty <= 0) {
+                cout << "[Error] Invalid quantity! Enter a positive number: ";
+                cin.clear();
+                cin.ignore(10000, '\n');
+            }
 
             if (qty > prod->quantity) {
                 cout << "[Error] Stock low! Maximum available: " << prod->quantity << "\n";
-            } else if (qty <= 0) {
-                cout << "[Error] Invalid quantity!\n";
             } else {
                 prod->quantity -= qty;
                 double lineTotal = prod->price * qty;
