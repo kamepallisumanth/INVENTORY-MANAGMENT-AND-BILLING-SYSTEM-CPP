@@ -29,7 +29,8 @@ int main() {
             cout << "4. Open Billing Counter\n";
             cout << "5. View Low-Stock Dashboard\n";
             cout << "6. Reprint Receipt by ID\n";
-            cout << "7. Logout & Exit\n";
+            cout << "7. View System Audit Trail Log\n";
+            cout << "8. Logout & Exit\n";
         } else {
             cout << "1. View Inventory Catalog\n";
             cout << "2. Search Product by Name\n";
@@ -85,7 +86,7 @@ int main() {
                         cin.ignore(10000, '\n');
                     }
 
-                    store.addOrUpdateProduct(id, existingProd->name, price, restockQty);
+                    store.addOrUpdateProduct(id, existingProd->name, price, restockQty, loggedInUser);
                 } else {
                     string name;
                     double price;
@@ -104,7 +105,7 @@ int main() {
                         cin.clear();
                         cin.ignore(10000, '\n');
                     }
-                    store.addOrUpdateProduct(id, name, price, qty);
+                    store.addOrUpdateProduct(id, name, price, qty, loggedInUser);
                 }
             } else if (choice == 2) {
                 store.displayInventory();
@@ -114,12 +115,14 @@ int main() {
                 cin >> keyword;
                 store.searchByName(keyword);
             } else if (choice == 4) {
-                store.processBilling();
+                store.processBilling(loggedInUser);
             } else if (choice == 5) {
                 store.checkLowStock();
             } else if (choice == 6) {
                 store.reprintReceipt();
             } else if (choice == 7) {
+                store.viewAuditLog();
+            } else if (choice == 8) {
                 cout << "\nLogging out... Goodbye, " << loggedInUser << "!\n";
                 break;
             } else {
@@ -134,7 +137,7 @@ int main() {
                 cin >> keyword;
                 store.searchByName(keyword);
             } else if (choice == 3) {
-                store.processBilling();
+                store.processBilling(loggedInUser);
             } else if (choice == 4) {
                 store.reprintReceipt();
             } else if (choice == 5) {
