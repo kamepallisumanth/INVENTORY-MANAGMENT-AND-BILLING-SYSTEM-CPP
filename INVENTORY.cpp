@@ -41,14 +41,46 @@ void InventorySystem::saveToFile() {
     file.close();
 }
 
-void InventorySystem::addOrUpdateProduct(int id, const string &name, double price, int quantity) {
+void InventorySystem::logAction(const string &username, const string &role, const string &action, const string &details) const {
+    time_t now = time(nullptr);
+    char timestamp[100];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
+
+    ofstream auditFile("audit_trail.log", ios::app);
+    if (auditFile.is_open()) {
+        auditFile << "[" << timestamp << "] User: " << username << " | Role: " << role << " | Action: " << action << " | Details: " << details << "\n";
+        auditFile.close();
+    }
+}
+
+void InventorySystem::viewAuditLog() const {
+    ifstream auditFile("audit_trail.log");
+    if (!auditFile.is_open()) {
+        cout << "\n[Notice] No audit trail logs found yet.\n";
+        return;
+    }
+
+    cout << "\n=======================================================\n";
+    cout << "                SYSTEM AUDIT TRAIL LOG                 \n";
+    cout << "=======================================================\n";
+    string line;
+    while (getline(auditFile, line)) {
+        cout << line << "\n";
+    }
+    cout << "=======================================================\n";
+    auditFile.close();
+}
+
+void InventorySystem::addOrUpdateProduct(int id, const string &name, double price, int quantity, const string &user) {
     if (catalog.find(id) != catalog.end()) {
         catalog[id].quantity += quantity;
         catalog[id].price = price;
         cout << "\n[Success] Updated stock and price for ID " << id << " (" << name << ").\n";
+        logAction(user, "ADMIN", "RESTOCK_UPDATE", "Product ID: " + to_string(id) + " | Name: " + name + " | Added Qty: " + to_string(quantity) + " | New Price: $" + to_string(price));
     } else {
         catalog[id] = {id, name, price, quantity};
         cout << "\n[Success] Added new product: " << name << " (ID: " << id << ").\n";
+        logAction(user, "ADMIN", "NEW_PRODUCT", "Registered Product ID: " + to_string(id) + " | Name: " + name + " | Price: $" + to_string(price) + " | Qty: " + to_string(quantity));
     }
     saveToFile();
 }
@@ -81,7 +113,6 @@ void InventorySystem::displayInventory() const {
     cout << "=======================================================\n";
 }
 
-// NEW FEATURE: Substring search implementation
 void InventorySystem::searchByName(const string &keyword) const {
     if (catalog.empty()) {
         cout << "\n[Notice] Inventory is empty.\n";
@@ -137,7 +168,7 @@ void InventorySystem::checkLowStock() const {
     cout << "=======================================================\n";
 }
 
-void InventorySystem::processBilling() {
+void InventorySystem::processBilling(const string &user) {
     if (catalog.empty()) {
         cout << "\n[Error] Cannot open billing counter. Inventory is empty.\n";
         return;
@@ -288,6 +319,10 @@ void InventorySystem::processBilling() {
             receipt << "======================================================-\n";
             receipt.close();
         }
+
+     
+        string buyerTypeStr = isRegisteredMerchant ? "MERCHANT" : "REGULAR";
+        logAction(user, buyerTypeStr, "PROCESS_BILLING", "Invoice: " + receiptName + " | Grand Total: $" + to_string(grandTotal) + " | Items Count: " + to_string(totalItemsCount));
     }
 }
 
@@ -311,4 +346,6 @@ void InventorySystem::reprintReceipt() const {
         cout << line << "\n";
     }
     file.close();
+
+    logAction("SYSTEM_OPERATOR", "USER", "REPRINT_RECEIPT", "Retrieved and printed invoice: " + filename);
 }
