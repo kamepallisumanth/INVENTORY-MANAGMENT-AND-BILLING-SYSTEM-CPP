@@ -40,6 +40,13 @@ bool authenticateUser(string &loggedInUser, string &role) {
             char timestamp[100];
             strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
+          
+            ofstream auditFile("audit_trail.log", ios::app);
+            if (auditFile.is_open()) {
+                auditFile << "[" << timestamp << "] User: " << loggedInUser << " | Role: " << role << " | Action: USER_LOGIN | Details: Successful authentication\n";
+                auditFile.close();
+            }
+
             ofstream logFile("login_logs.txt", ios::app);
             if (logFile.is_open()) {
                 logFile << "User: " << loggedInUser << " | Role: " << role << " | Login Time: " << timestamp << "\n";
@@ -49,6 +56,16 @@ bool authenticateUser(string &loggedInUser, string &role) {
             cout << "\n[Access Granted] Welcome, " << loggedInUser << " (" << role << " mode logged at " << timestamp << ").\n";
             return true;
         }
+    }
+
+    
+    time_t now = time(nullptr);
+    char timestamp[100];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
+    ofstream auditFile("audit_trail.log", ios::app);
+    if (auditFile.is_open()) {
+        auditFile << "[" << timestamp << "] User: UNKNOWN | Role: UNAUTHENTICATED | Action: SECURITY_ALERT | Details: Failed login attempt with username: " << username << "\n";
+        auditFile.close();
     }
 
     cout << "\n[Access Denied] Invalid username or password.\n";
